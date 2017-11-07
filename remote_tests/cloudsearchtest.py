@@ -22,4 +22,4 @@ result_view = {'limit': '100', 'view': 'track'}
 recent_tracks = CloudSearch.query.search_tracks(search_term_bundle, result_view, client)
 
 for track in recent_tracks:
-    print track.displaytitle
+    print track.displaytitles

@@ -54,7 +54,6 @@ class CloudSearchQuery(object):
         if save_search_history:
             ET.SubElement(xml_search_filters, 'savesearchhistory').text = 'true'
 
-        print 'dump ' + ET.tostring(xml_data)
         xml_post_body = ET.tostring(xml_data)
 
         return _client.post_xml(self.METHOD_URI, xml_post_body)
