@@ -50,6 +50,21 @@ class AlbumQuery(object):
 
         return album_list
 
+    def get_album_by_id(self, album_id, _client):
+        """Gets an album by ID.
+
+        :param album_id: The Harvest Media album identifer
+        :param _client: An initialized instance of :class:`harvestmedia.api.client.Client`
+
+        """
+        method_uri = '/getalbum/{{service_token}}/' + album_id
+        xml_root = _client.get_xml(method_uri)
+
+        album = Album._from_xml(xml_root.find('album'), _client=_client)
+
+        return album
+
+
     def get_cover_url_for_album(self, album_id, _client, width=None, height=None):
         """Generates a URL that can be used to fetch the
         cover image for an album on Harvest Media
