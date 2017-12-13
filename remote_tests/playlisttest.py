@@ -16,3 +16,7 @@ playlists = member.get_playlists()
 #playlist.member_id = '46d6bb0b1a2aafe7'
 #playlist.name = 'test playlist'
 #playlist.create()
+
+playlist = Playlist.query.get_featured_playlist('50157d60949757a1', client)
+
+print playlist.name

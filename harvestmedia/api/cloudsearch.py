@@ -36,11 +36,29 @@ class CloudSearchQuery(object):
 
         return tracks
 
-    def _search(self, search_term_bundle, result_view, _client, save_search_history=False):
+    def search_playlist(self, playlist_id, search_term_bundle, result_view, _client, save_search_history=False):
+
+        xml_data = self._search(search_term_bundle, result_view, _client, save_search_history, playlist=playlist_id)
+
+        xml_tracks = xml_data.find('tracks')
+
+        tracks = []
+
+        if xml_tracks is not None:
+            for xml_track in xml_tracks.getchildren():
+                tracks.append(Track._from_xml(xml_track, _client))
+
+        return tracks
+
+    def _search(self, search_term_bundle, result_view, _client, save_search_history=False, playlist=None):
 
         xml_data = ET.Element('requestcloudsearch')
         xml_search_filters = ET.SubElement(xml_data, 'searchfilters')
-        ET.SubElement(xml_search_filters, 'searchtype').text = 'normal'
+        search_type = 'Normal'
+        if playlist:
+            ET.SubElement(xml_search_filters, 'playlist').text = playlist
+            search_type = 'PlaylistTracks'
+        ET.SubElement(xml_search_filters, 'searchtype').text = search_type
         if search_term_bundle:
             xml_search_term_bundle = ET.SubElement(xml_search_filters, 'searchtermbundle')
             for search_term, value in search_term_bundle.iteritems():

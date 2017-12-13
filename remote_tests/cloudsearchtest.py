@@ -23,3 +23,11 @@ recent_tracks = CloudSearch.query.search_tracks(search_term_bundle, result_view,
 
 for track in recent_tracks:
     print track.displaytitle
+
+search_term_bundle = {'st_keyword_aggregated': '%'}
+result_view = {'limit': '100', 'view': 'track'}
+playlist_tracks = CloudSearch.query.search_playlist('50157d60949757a1', search_term_bundle, result_view, client)
+
+print 'playlist!'
+for track in playlist_tracks:
+    print track.displaytitle

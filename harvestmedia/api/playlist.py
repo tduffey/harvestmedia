@@ -51,6 +51,22 @@ class PlaylistQuery(object):
 
         return playlists
 
+    def get_featured_playlist(self, playlist_id, _client):
+        """Gets a featured playlist by id
+
+                :param playlist_id: The Harvest Media playlist identifier
+                :param _client: An initialized instance of :class:`harvestmedia.api.client.Client`
+
+        """
+
+        method_uri = '/getfeaturedplaylist/{{service_token}}/' + playlist_id
+
+        xml_root = _client.get_xml(method_uri)
+
+        playlist_elements = xml_root.find('playlists')
+        playlist = Playlist._from_xml(playlist_elements[0], _client)
+        return playlist
+
     def add_track(self, member_id, playlist_id, track_id, _client):
         """Adds a track to a member playlist.
 
