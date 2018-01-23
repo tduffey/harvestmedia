@@ -17,9 +17,10 @@ for album in recent_albums:
     print album.name
     album_ids.append(album.id)
 
-search_term_bundle = {'st_keyword_aggregated': '%', 'st_album': ','.join(album_ids)}
+search_term_bundle = {'st_keyword_aggregated': '%', 'st_keyword': 'blended'}
+keyword_fields = 'CategoryAttributeName'
 result_view = {'limit': '100', 'view': 'track'}
-recent_tracks = CloudSearch.query.search_tracks(search_term_bundle, result_view, client)
+recent_tracks = CloudSearch.query.search_tracks(search_term_bundle, result_view, client, keyword_fields)
 
 for track in recent_tracks:
     print track.displaytitle

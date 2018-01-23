@@ -57,13 +57,14 @@ class CloudSearchQuery(object):
         search_type = 'Normal'
         if playlist:
             ET.SubElement(xml_search_filters, 'playlist').text = playlist
-            search_type = 'PlaylistTracks' 
+            search_type = 'PlaylistTracks'
         ET.SubElement(xml_search_filters, 'searchtype').text = search_type
         if search_term_bundle:
             xml_search_term_bundle = ET.SubElement(xml_search_filters, 'searchtermbundle')
             for search_term, value in search_term_bundle.iteritems():
-                xml_element = ET.SubElement(xml_search_term_bundle, search_term).text = value
-                if keyword_fields & search_term == 'st_keyword':
+                xml_element = ET.SubElement(xml_search_term_bundle, search_term)
+                xml_element.text = value
+                if keyword_fields and search_term == 'st_keyword':
                     xml_element.set('fields', keyword_fields)
 
         if result_view:
