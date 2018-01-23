@@ -22,9 +22,9 @@ class CloudSearchQuery(object):
 
         return albums
 
-    def search_tracks(self, search_term_bundle, result_view, _client, save_search_history=False):
+    def search_tracks(self, search_term_bundle, result_view, _client, keyword_fields=None, save_search_history=False):
 
-        xml_data = self._search(search_term_bundle, result_view, _client, save_search_history)
+        xml_data = self._search(search_term_bundle, result_view, _client, keyword_fields, save_search_history)
 
         xml_tracks = xml_data.find('tracks')
 
@@ -50,19 +50,21 @@ class CloudSearchQuery(object):
 
         return tracks
 
-    def _search(self, search_term_bundle, result_view, _client, save_search_history=False, playlist=None):
+    def _search(self, search_term_bundle, result_view, _client, keyword_fields=None, save_search_history=False, playlist=None):
 
         xml_data = ET.Element('requestcloudsearch')
         xml_search_filters = ET.SubElement(xml_data, 'searchfilters')
         search_type = 'Normal'
         if playlist:
             ET.SubElement(xml_search_filters, 'playlist').text = playlist
-            search_type = 'PlaylistTracks'
+            search_type = 'PlaylistTracks' 
         ET.SubElement(xml_search_filters, 'searchtype').text = search_type
         if search_term_bundle:
             xml_search_term_bundle = ET.SubElement(xml_search_filters, 'searchtermbundle')
             for search_term, value in search_term_bundle.iteritems():
-                ET.SubElement(xml_search_term_bundle, search_term).text = value
+                xml_element = ET.SubElement(xml_search_term_bundle, search_term).text = value
+                if keyword_fields & search_term == 'st_keyword':
+                    xml_element.set('fields', keyword_fields)
 
         if result_view:
             xml_result_view = ET.SubElement(xml_search_filters, 'resultview')
