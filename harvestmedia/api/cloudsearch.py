@@ -22,9 +22,9 @@ class CloudSearchQuery(object):
 
         return albums
 
-    def search_tracks(self, search_term_bundle, result_view, _client, keyword_fields=None, save_search_history=False):
+    def search_tracks(self, search_term_bundle, result_view, _client, save_search_history=False):
 
-        xml_data = self._search(search_term_bundle, result_view, _client, keyword_fields, save_search_history)
+        xml_data = self._search(search_term_bundle, result_view, _client, save_search_history)
 
         xml_tracks = xml_data.find('tracks')
 
@@ -50,7 +50,7 @@ class CloudSearchQuery(object):
 
         return tracks
 
-    def _search(self, search_term_bundle, result_view, _client, keyword_fields=None, save_search_history=False, playlist=None):
+    def _search(self, search_term_bundle, result_view, _client, save_search_history=False, playlist=None):
 
         xml_data = ET.Element('requestcloudsearch')
         xml_search_filters = ET.SubElement(xml_data, 'searchfilters')
@@ -61,11 +61,12 @@ class CloudSearchQuery(object):
         ET.SubElement(xml_search_filters, 'searchtype').text = search_type
         if search_term_bundle:
             xml_search_term_bundle = ET.SubElement(xml_search_filters, 'searchtermbundle')
-            for search_term, value in search_term_bundle.iteritems():
-                xml_element = ET.SubElement(xml_search_term_bundle, search_term)
-                xml_element.text = value
-                if keyword_fields and search_term == 'st_keyword':
-                    xml_element.set('fields', keyword_fields)
+            for search_term in search_term_bundle:
+                xml_element = ET.SubElement(xml_search_term_bundle, search_term.name)
+                xml_element.text = search_term.value
+                if search_term.fields:
+                    for field, value in search_term.fields.iteritems():
+                        xml_element.set(field, value)
 
         if result_view:
             xml_result_view = ET.SubElement(xml_search_filters, 'resultview')
@@ -80,11 +81,26 @@ class CloudSearchQuery(object):
         return _client.post_xml(self.METHOD_URI, xml_post_body)
 
 
-
 class CloudSearch(DictObj):
 
     query = CloudSearchQuery()
 
     def __init__(self, _client):
         self.client = _client
+
+
+class SearchTerm:
+
+    def __init__(self, name, value, fields=None):
+        self.name = name
+        self.value = value
+        self.fields = {}
+        if fields:
+            self.fields = fields
+
+    def addField(self, field):
+        self.fields.update(field)
+
+    def addValue(self, value):
+        self.value = value
 
