@@ -33,3 +33,18 @@ playlist_tracks = CloudSearch.query.search_playlist('50157d60949757a1', search_t
 print 'playlist!'
 for track in playlist_tracks:
     print track.displaytitle
+
+
+search_term_bundle = {'st_keyword_aggregated', '%'}
+
+print search_term_bundle
+
+print 'AUTO COMPLETE'
+
+request_autocomplete = [SearchTerm('keyword', 'blues'), SearchTerm('wildcard', 'true'),
+                        SearchTerm('returntracks', 'true'), SearchTerm('regionid', '7e1d40ce08bf6046')]
+
+tracks = CloudSearch.query.autocomplete(request_autocomplete, client)
+
+for track in tracks:
+    print track.displaytitle

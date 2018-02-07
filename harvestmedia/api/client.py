@@ -168,6 +168,17 @@ class Client(object):
 
         self.config.service_token = ServiceToken(self.config, token, expiry)
 
+    def get_default_region(self):
+        method_uri = '/getregions/' + self.config.service_token.token
+
+        root = self.get_xml(method_uri)
+
+        xml_regions = root.find('regions')
+        for region in xml_regions:
+            if region.find('name').text == 'Default':
+                return region.find('id').text
+
+
     def get_service_info(self):
         """Gets the service info for the current HM account.
         Service info includes URLs for album art, waveforms,

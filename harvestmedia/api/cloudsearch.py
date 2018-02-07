@@ -8,6 +8,7 @@ from util import DictObj
 
 class CloudSearchQuery(object):
     METHOD_URI = '/cloudsearch/{{service_token}}'
+    AUTOCOMPLETE_METHOD_URI = '/autocomplete/{{service_token}}'
 
     def search_albums(self, search_term_bundle, result_view, _client, save_search_history=False):
 
@@ -79,6 +80,27 @@ class CloudSearchQuery(object):
         xml_post_body = ET.tostring(xml_data)
 
         return _client.post_xml(self.METHOD_URI, xml_post_body)
+
+    def autocomplete(self, request_autocomplete, _client):
+
+        xml_data = ET.Element('requestautocomplete')
+        if request_autocomplete:
+            for field in request_autocomplete:
+                xml_element = ET.SubElement(xml_data, field.name)
+                xml_element.text = field.value
+
+        xml_post_body = ET.tostring(xml_data)
+
+        xml_result = _client.post_xml(self.AUTOCOMPLETE_METHOD_URI, xml_post_body)
+        xml_tracks = xml_result.find('autocomplete_tracks')
+
+        tracks = []
+
+        if xml_tracks is not None:
+            for xml_track in xml_tracks.getchildren():
+                tracks.append(Track._from_xml(xml_track, _client))
+
+        return tracks
 
 
 class CloudSearch(DictObj):
