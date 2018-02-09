@@ -89,6 +89,9 @@ class CloudSearchQuery(object):
                 xml_element = ET.SubElement(xml_data, field.name)
                 xml_element.text = field.value
 
+        xml_element_region = ET.SubElement(xml_data, 'regionid')
+        xml_element_region.text = _client.config.region_id
+
         xml_post_body = ET.tostring(xml_data)
 
         xml_result = _client.post_xml(self.AUTOCOMPLETE_METHOD_URI, xml_post_body)

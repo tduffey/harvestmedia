@@ -42,7 +42,7 @@ print search_term_bundle
 print 'AUTO COMPLETE'
 
 request_autocomplete = [SearchTerm('keyword', 'blues'), SearchTerm('wildcard', 'true'),
-                        SearchTerm('returntracks', 'true'), SearchTerm('regionid', '7e1d40ce08bf6046')]
+                        SearchTerm('returntracks', 'true')]
 
 tracks = CloudSearch.query.autocomplete(request_autocomplete, client)
 

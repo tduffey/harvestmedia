@@ -32,6 +32,7 @@ class Client(object):
         self.config = Config(debug_level=debug_level, webservice_url=webservice_url)
         self.request_service_token()
         self.get_service_info()
+        self.get_default_region()
 
     @property
     def debug_level(self):
@@ -173,10 +174,11 @@ class Client(object):
 
         root = self.get_xml(method_uri)
 
+        self.config.region_id = None
         xml_regions = root.find('regions')
         for region in xml_regions:
             if region.find('name').text == 'Default':
-                return region.find('id').text
+                self.config.region_id = region.find('id').text
 
 
     def get_service_info(self):
