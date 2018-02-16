@@ -3,6 +3,7 @@ import xml.etree.cElementTree as ET
 
 from album import Album
 from track import Track
+from category import Category
 from util import DictObj
 
 
@@ -81,7 +82,33 @@ class CloudSearchQuery(object):
 
         return _client.post_xml(self.METHOD_URI, xml_post_body)
 
-    def autocomplete(self, request_autocomplete, _client):
+    def autocomplete_tracks(self, request_autocomplete, _client):
+        xml_result = self._autocomplete(request_autocomplete, _client)
+
+        xml_tracks = xml_result.find('autocomplete_tracks')
+
+        tracks = []
+
+        if xml_tracks is not None:
+            for xml_track in xml_tracks.getchildren():
+                tracks.append(Track._from_xml(xml_track, _client))
+
+        return tracks
+
+    def autocomplete_categories(self, request_autocomplete, _client):
+        xml_result = self._autocomplete(request_autocomplete, _client)
+
+        xml_categories = xml_result.find('autocomplete_categoryattributes')
+
+        tracks = []
+
+        if xml_categories is not None:
+            for category in xml_categories.getchildren():
+                tracks.append(Category._from_xml(category, _client))
+
+        return tracks
+
+    def _autocomplete(self, request_autocomplete, _client):
 
         xml_data = ET.Element('requestautocomplete')
         if request_autocomplete:
@@ -94,16 +121,7 @@ class CloudSearchQuery(object):
 
         xml_post_body = ET.tostring(xml_data)
 
-        xml_result = _client.post_xml(self.AUTOCOMPLETE_METHOD_URI, xml_post_body)
-        xml_tracks = xml_result.find('autocomplete_tracks')
-
-        tracks = []
-
-        if xml_tracks is not None:
-            for xml_track in xml_tracks.getchildren():
-                tracks.append(Track._from_xml(xml_track, _client))
-
-        return tracks
+        return _client.post_xml(self.AUTOCOMPLETE_METHOD_URI, xml_post_body)
 
 
 class CloudSearch(DictObj):

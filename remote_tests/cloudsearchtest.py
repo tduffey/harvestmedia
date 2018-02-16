@@ -41,10 +41,15 @@ print search_term_bundle
 
 print 'AUTO COMPLETE'
 
-request_autocomplete = [SearchTerm('keyword', 'blues'), SearchTerm('wildcard', 'true'),
-                        SearchTerm('returntracks', 'true')]
+request_autocomplete = [SearchTerm('keyword', 'blu'), SearchTerm('wildcard', 'true'),
+                                SearchTerm('returncategoryattributes', 'true'),
+                                SearchTerm('returncategoryattributes_limit', '5'),
+                                SearchTerm('returncategoryattributes_showonplayeronly', 'false'),
+                                SearchTerm('returncategoryattributes_includecategory', 'false'),
+                                SearchTerm('returncategoryattributes_order', 'AllAlphabetic'),
+                                SearchTerm('returncategoryattributes_disablekeywordgroup', 'false')]
 
-tracks = CloudSearch.query.autocomplete(request_autocomplete, client)
+cats = CloudSearch.query.autocomplete_categories(request_autocomplete, client)
 
-for track in tracks:
-    print track.displaytitle
+for cat in cats:
+    print cat.name
