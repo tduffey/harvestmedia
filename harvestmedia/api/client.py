@@ -32,6 +32,7 @@ class Client(object):
         self.config = Config(debug_level=debug_level, webservice_url=webservice_url)
         self.request_service_token()
         self.get_service_info()
+        self.get_default_region()
 
     @property
     def debug_level(self):
@@ -167,6 +168,18 @@ class Client(object):
         expiry = xml_token.get('expiry')
 
         self.config.service_token = ServiceToken(self.config, token, expiry)
+
+    def get_default_region(self):
+        method_uri = '/getregions/' + self.config.service_token.token
+
+        root = self.get_xml(method_uri)
+
+        self.config.region_id = None
+        xml_regions = root.find('regions')
+        for region in xml_regions:
+            if region.find('name').text == 'Default':
+                self.config.region_id = region.find('id').text
+
 
     def get_service_info(self):
         """Gets the service info for the current HM account.
