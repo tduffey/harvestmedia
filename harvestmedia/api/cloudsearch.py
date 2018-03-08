@@ -11,9 +11,9 @@ class CloudSearchQuery(object):
     METHOD_URI = '/cloudsearch/{{service_token}}'
     AUTOCOMPLETE_METHOD_URI = '/autocomplete/{{service_token}}'
 
-    def search_albums(self, search_term_bundle, result_view, _client, save_search_history=False):
+    def search_albums(self, search_term_bundle, result_view, _client, main_only=True, save_search_history=False):
 
-        xml_data = self._search(search_term_bundle, result_view, _client, save_search_history)
+        xml_data = self._search(search_term_bundle, result_view, _client, main_only, save_search_history)
 
         xml_albums = xml_data.find('albums')
 
@@ -24,23 +24,9 @@ class CloudSearchQuery(object):
 
         return albums
 
-    def search_tracks(self, search_term_bundle, result_view, _client, save_search_history=False):
+    def search_tracks(self, search_term_bundle, result_view, _client, main_only=True, save_search_history=False):
 
-        xml_data = self._search(search_term_bundle, result_view, _client, save_search_history)
-
-        xml_tracks = xml_data.find('tracks')
-
-        tracks = []
-
-        if xml_tracks is not None:
-            for xml_track in xml_tracks.getchildren():
-                tracks.append(Track._from_xml(xml_track, _client))
-
-        return tracks
-
-    def search_playlist(self, playlist_id, search_term_bundle, result_view, _client, save_search_history=False):
-
-        xml_data = self._search(search_term_bundle, result_view, _client, save_search_history, playlist=playlist_id)
+        xml_data = self._search(search_term_bundle, result_view, _client, main_only, save_search_history)
 
         xml_tracks = xml_data.find('tracks')
 
@@ -52,7 +38,24 @@ class CloudSearchQuery(object):
 
         return tracks
 
-    def _search(self, search_term_bundle, result_view, _client, save_search_history=False, playlist=None):
+    def search_playlist(self, playlist_id, search_term_bundle, result_view, _client, main_only=True,
+                        save_search_history=False):
+
+        xml_data = self._search(search_term_bundle, result_view, _client, main_only, save_search_history,
+                                playlist=playlist_id)
+
+        xml_tracks = xml_data.find('tracks')
+
+        tracks = []
+
+        if xml_tracks is not None:
+            for xml_track in xml_tracks.getchildren():
+                tracks.append(Track._from_xml(xml_track, _client))
+
+        return tracks
+
+    def _search(self, search_term_bundle, result_view, _client, main_only=True, save_search_history=False,
+                playlist=None):
 
         xml_data = ET.Element('requestcloudsearch')
         xml_search_filters = ET.SubElement(xml_data, 'searchfilters')
@@ -60,6 +63,8 @@ class CloudSearchQuery(object):
         if playlist:
             ET.SubElement(xml_search_filters, 'playlist').text = playlist
             search_type = 'PlaylistTracks'
+        if main_only:
+            ET.SubElement(xml_search_filters, 'mainonly').text = main_only
         ET.SubElement(xml_search_filters, 'searchtype').text = search_type
         if search_term_bundle:
             xml_search_term_bundle = ET.SubElement(xml_search_filters, 'searchtermbundle')
