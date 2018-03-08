@@ -9,6 +9,25 @@ class AlbumQuery(object):
 
     """
 
+    def get_all_albums(self, _client, include_inactive=False):
+        """Gets all of the albums.
+
+        :param _client: An initialized instance of :class:`harvestmedia.api.client.Client`
+
+        """
+
+        album_list = []
+        method_uri = '/getalbums/{{service_token}}'
+        if include_inactive:
+            method_uri += '/IncludeInactive'
+        xml_root = _client.get_xml(method_uri)
+        albums = xml_root.find('albums').getchildren()
+
+        for album_element in albums:
+            album = Album._from_xml(album_element, _client=_client)
+            album_list.append(album)
+
+        return album_list
 
     def get_albums_for_library(self, library_id, _client, include_inactive=False):
         """Gets all of the albums for a particular library.
@@ -30,6 +49,21 @@ class AlbumQuery(object):
             album_list.append(album)
 
         return album_list
+
+    def get_album_by_id(self, album_id, _client):
+        """Gets an album by ID.
+
+        :param album_id: The Harvest Media album identifer
+        :param _client: An initialized instance of :class:`harvestmedia.api.client.Client`
+
+        """
+        method_uri = '/getalbum/{{service_token}}/' + album_id
+        xml_root = _client.get_xml(method_uri)
+
+        album = Album._from_xml(xml_root.find('album'), _client=_client)
+
+        return album
+
 
     def get_cover_url_for_album(self, album_id, _client, width=None, height=None):
         """Generates a URL that can be used to fetch the
