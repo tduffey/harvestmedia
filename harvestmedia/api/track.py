@@ -114,6 +114,16 @@ class TrackQuery(object):
 
         return download_url
 
+    def get_waveform_url(self, track_id, _client, width=None, height=None):
+
+        asset_url = _client.config.waveform_url
+        asset_url = asset_url.replace('{id}', track_id)
+        if width:
+            asset_url = asset_url.replace('{width}', str(width))
+        if height:
+            asset_url = asset_url.replace('{height}', str(height))
+        return asset_url
+
 
 class Track(DictObj):
     """ Represents a Harvest Media track asset
