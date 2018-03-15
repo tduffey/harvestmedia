@@ -137,6 +137,7 @@ class Track(DictObj):
     def __init__(self, _client):
 
         self.categories = []
+        self.alternate_tracks = []
         self._client = _client
 
     @classmethod
@@ -167,6 +168,11 @@ class Track(DictObj):
         if categories is not None:
             for category in categories.getchildren():
                 instance.categories.append(Category._from_xml(category, _client=_client))
+
+        alternates = xml_data.find('alternatetracks')
+        if alternates is not None:
+            for alternate in alternates.getchildren():
+                instance.alternate_tracks.append(Track._from_xml(alternate, _client=_client))
 
         return instance
 
