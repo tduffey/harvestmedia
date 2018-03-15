@@ -10,6 +10,7 @@ from util import DictObj
 class CloudSearchQuery(object):
     METHOD_URI = '/cloudsearch/{{service_token}}'
     AUTOCOMPLETE_METHOD_URI = '/autocomplete/{{service_token}}'
+    SIMILAR_TRACKS_METHOD_URI = '/getsimilartracks/{{service_token}}'
 
     def search_albums(self, search_term_bundle, result_view, _client, main_only=True, save_search_history=False):
 
@@ -128,6 +129,30 @@ class CloudSearchQuery(object):
 
         return _client.post_xml(self.AUTOCOMPLETE_METHOD_URI, xml_post_body)
 
+    def similar_tracks(self, request_similar_tracks, _client):
+
+        xml_data = ET.Element('requestsimilartracks')
+        if request_similar_tracks:
+            for field in request_similar_tracks:
+                xml_element = ET.SubElement(xml_data, field.name)
+                xml_element.text = field.value
+
+        ET.SubElement(xml_data, 'region').text = _client.config.region_id
+        ET.SubElement(xml_data, 'mainonly').text = 'true'
+
+        xml_post_body = ET.tostring(xml_data)
+
+        xml_result = _client.post_xml(self.SIMILAR_TRACKS_METHOD_URI, xml_post_body)
+
+        xml_tracks = xml_result.find('tracks')
+
+        tracks = []
+
+        if xml_tracks is not None:
+            for xml_track in xml_tracks.getchildren():
+                tracks.append(Track._from_xml(xml_track, _client))
+
+        return tracks
 
 class CloudSearch(DictObj):
 

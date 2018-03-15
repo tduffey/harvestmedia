@@ -7,12 +7,20 @@ webservice_url = 'https://service.harvestmedia.net/HMP-WS.svc'
 
 client = Client(api_key=api_key, debug_level='DEBUG')
 
+search_term_bundle = [SearchTerm('track', '7cde8d322bf084ab'), SearchTerm('similaritypercentage', '50')]
+similar_tracks = CloudSearch.query.similar_tracks(search_term_bundle, client)
+
+print 'Similar Tracks:'
+for track in similar_tracks:
+    print track.displaytitle
+
 search_term_bundle = [SearchTerm('st_keyword_aggregated', '%')]
 result_view = {'limit': '6', 'view': 'album', 'sort_predefined': 'ReleaseDate_Desc'}
 recent_albums = CloudSearch.query.search_albums(search_term_bundle, result_view, client)
 
 album_ids = []
 
+print '\nAlbums:'
 for album in recent_albums:
     print album.name
     album_ids.append(album.id)
@@ -23,6 +31,7 @@ search_term_bundle = [SearchTerm('st_keyword_aggregated', '%'), SearchTerm('st_k
 result_view = {'limit': '100', 'view': 'track'}
 recent_tracks = CloudSearch.query.search_tracks(search_term_bundle, result_view, client)
 
+print '\nTracks:'
 for track in recent_tracks:
     print track.displaytitle
 
@@ -30,7 +39,7 @@ search_term_bundle = [SearchTerm('st_keyword_aggregated', '%')]
 result_view = {'limit': '100', 'view': 'track'}
 playlist_tracks = CloudSearch.query.search_playlist('50157d60949757a1', search_term_bundle, result_view, client)
 
-print 'playlist!'
+print '\nPlaylist Tracks:'
 for track in playlist_tracks:
     print track.displaytitle
 
@@ -39,7 +48,7 @@ search_term_bundle = {'st_keyword_aggregated', '%'}
 
 print search_term_bundle
 
-print 'AUTO COMPLETE'
+print '\nAuto Complete:'
 
 request_autocomplete = [SearchTerm('keyword', 'blu'), SearchTerm('wildcard', 'true'),
                                 SearchTerm('returncategoryattributes', 'true'),
