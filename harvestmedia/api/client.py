@@ -169,8 +169,9 @@ class Client(object):
 
         token = xml_token.get('value')
         expiry = xml_token.get('expiry')
+        offset = xml_token.get('utcoffset')
 
-        self.config.service_token = ServiceToken(self.config, token, expiry)
+        self.config.service_token = ServiceToken(self.config, token, offset, expiry)
 
     def get_default_region(self):
         method_uri = '/getregions/' + self.config.service_token.token

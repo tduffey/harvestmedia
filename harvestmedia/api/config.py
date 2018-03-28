@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-import datetime
-import iso8601
 import logging
-import pytz
+import arrow
+
 from urlparse import urlparse
 
 from .exceptions import TokenExpired
@@ -12,14 +11,23 @@ logger = logging.getLogger('harvestmedia')
 
 
 class ServiceToken(object):
-    def __init__(self, config, token, expiry):
+    def __init__(self, config, token, offset, expiry):
         self._token = None
+        self._offset = None
         self._expiry = None
-        self._expiry_dt = None
 
         self.config = config
+        self.offset = offset
         self.expiry = expiry
         self.token = token
+
+    @property
+    def offset(self):
+        return self._offset
+
+    @offset.setter
+    def offset(self, value):
+        self._offset = -int(value)
 
     @property
     def expiry(self):
@@ -27,19 +35,18 @@ class ServiceToken(object):
 
     @expiry.setter
     def expiry(self, value):
-        # convert from the harvestmedia timezone to UTC
-        service_token_expires_date = iso8601.parse_date(value)
-        hm_tz = pytz.timezone(self.config.timezone)
-        service_token_expires_date = service_token_expires_date.replace(tzinfo=hm_tz)
-        utc_tz = pytz.timezone('UTC')
-        self._expiry_dt = service_token_expires_date.astimezone(utc_tz)
-        self._expiry = self._expiry_dt.isoformat()
+        hm_expire_date = arrow.get(value)
+        utc_expire_date = hm_expire_date.shift(hours=self._offset)
+        self._expiry = utc_expire_date
 
     @property
     def token(self):
-        utc_now = datetime.datetime.now(pytz.utc)
-        if self._expiry_dt <= utc_now:
-            logger.debug('%s <=> %s' % (self._expiry_dt, utc_now))
+        utc_now = arrow.utcnow()
+        print('checking token: %s <=> %s' % (self._expiry, utc_now))
+        print(self._token)
+        logger.debug('checking token: %s <=> %s' % (self._expiry, utc_now))
+        if self._expiry <= utc_now:
+            logger.debug('%s <=> %s' % (self._expiry, utc_now))
             raise TokenExpired
 
         return self._token
