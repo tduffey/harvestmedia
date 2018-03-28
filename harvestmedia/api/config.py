@@ -42,8 +42,6 @@ class ServiceToken(object):
     @property
     def token(self):
         utc_now = arrow.utcnow()
-        print('checking token: %s <=> %s' % (self._expiry, utc_now))
-        print(self._token)
         logger.debug('checking token: %s <=> %s' % (self._expiry, utc_now))
         if self._expiry <= utc_now:
             logger.debug('%s <=> %s' % (self._expiry, utc_now))
