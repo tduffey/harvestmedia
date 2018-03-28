@@ -55,6 +55,8 @@ class Client(object):
 
         uri = uri.replace('{{service_token}}', service_token)
 
+        logger.debug('URI: ' + uri + ' using token: ' + service_token)
+
         return uri
 
     def _build_url(self, path):
@@ -96,8 +98,8 @@ class Client(object):
                     now = datetime.datetime.utcnow()
                     if self.config.service_token:
                         token_expiration = self.config.service_token.expiry
-                        message = "invalid token received.  now: %s our expiration: %s" % \
-                                        (now.isoformat(), token_expiration)
+                        message = "invalid token received.  now: %s our expiration: %s value %s" % \
+                                        (now.isoformat(), token_expiration, self.config.service_token)
                     else:
                         message = "no token set"
                     raise exceptions.InvalidToken(message)
@@ -161,6 +163,7 @@ class Client(object):
         xml_token = root.find('token')
 
         if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('REQUESTING NEW TOKEN')
             logger.debug('got token: %s (expires: %s)' % \
                 (xml_token.get('value'), xml_token.get('expiry')))
 
