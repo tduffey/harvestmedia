@@ -23,7 +23,7 @@ class Client(object):
     """
 
     def __init__(self, api_key, debug_level='INFO',
-                    webservice_url='https://service.harvestmedia.net/HMP-WS.svc'):
+                    webservice_url='https://services.harvestmedia.local'):
 
         self.api_key = api_key
         self.debug_level = debug_level
